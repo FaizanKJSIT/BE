@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -25,9 +27,9 @@ public class User
     private String last_name;
 
     @Column(nullable = false)
-    private String email_id;
+    private List<String> email_id;
 
-    private long mobile_no;
+    private List<Integer> mobile_no;
     
     private String qualifications;
 
