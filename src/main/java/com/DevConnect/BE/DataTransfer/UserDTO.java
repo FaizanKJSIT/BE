@@ -17,7 +17,7 @@ public class UserDTO
     private String middle_name;
     private String last_name;
     private List<String> email_id;
-    private List<Integer> mobile_no;
+    private List<Long> mobile_no;
     private String qualifications;
     private String domain_interest;
 }

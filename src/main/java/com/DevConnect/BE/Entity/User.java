@@ -1,10 +1,10 @@
 package com.DevConnect.BE.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.List;
 
 @NoArgsConstructor
@@ -15,10 +15,12 @@ import java.util.List;
 public class User
 {
     @Id
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false)
+    @Size(min=10)
     private String username;
 
-    @Column(nullable = false, length = 8)
+    @Column(nullable = false)
+    @Size(min=8)
     private String password;
 
     @Column(nullable = false)
@@ -26,10 +28,15 @@ public class User
     private String middle_name;
     private String last_name;
 
-    @Column(nullable = false)
+//    @OneToMany
+//    @JoinColumn(name="email_id")
+    @ElementCollection
     private List<String> email_id;
 
-    private List<Integer> mobile_no;
+//    @OneToMany
+//    @JoinColumn(name="mobile_no")
+    @ElementCollection
+    private List<Long> mobile_no;
     
     private String qualifications;
 

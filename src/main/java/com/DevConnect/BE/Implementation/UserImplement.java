@@ -7,16 +7,17 @@ import com.DevConnect.BE.Repo.UserRepo;
 import com.DevConnect.BE.Service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class UserImplement implements UserService
 {
     @Autowired
     private UserRepo userRepo;
 
-    @Autowired
-    private ModelMapper mapper;
+    private ModelMapper mapper = new ModelMapper();
 
     private User FindUser(String username)
     { return userRepo.findById(username).orElseThrow(() -> new ResourceNotFoundException("User", "Username", username)); }
@@ -39,9 +40,7 @@ public class UserImplement implements UserService
     @Override
     public UserDTO CreateUser(UserDTO newUser)
     {
-        User user = mapper.map(newUser, User.class);
-        userRepo.save(user);
-        return mapper.map(user, UserDTO.class);
+        return SaveUser(newUser);
     }
 
     @Override
@@ -108,30 +107,30 @@ public class UserImplement implements UserService
     }
 
     @Override
-    public UserDTO AddMobileNo(String username, int MobileNo)
+    public UserDTO AddMobileNo(String username, long MobileNo)
     {
         User user = FindUser(username);
-        List<Integer> AllMob = user.getMobile_no();
+        List<Long> AllMob = user.getMobile_no();
         AllMob.add(MobileNo);
         user.setMobile_no(AllMob);
         return SaveUser(mapper.map(user, UserDTO.class));
     }
 
     @Override
-    public UserDTO ReplaceMobileNo(String username, int oldMobileNo, int newMobileNo)
+    public UserDTO ReplaceMobileNo(String username, long oldMobileNo, long newMobileNo)
     {
         User user = FindUser(username);
-        List<Integer> AllMob = user.getMobile_no();
+        List<Long> AllMob = user.getMobile_no();
         AllMob.set(AllMob.indexOf(oldMobileNo), newMobileNo);
         user.setMobile_no(AllMob);
         return SaveUser(mapper.map(user, UserDTO.class));
     }
 
     @Override
-    public UserDTO RemoveMobileNo(String username, int MobileNo)
+    public UserDTO RemoveMobileNo(String username, long MobileNo)
     {
         User user = FindUser(username);
-        List<Integer> AllMob = user.getMobile_no();
+        List<Long> AllMob = user.getMobile_no();
         AllMob.remove(MobileNo);
         user.setMobile_no(AllMob);
         return SaveUser(mapper.map(user, UserDTO.class));
@@ -173,15 +172,16 @@ public class UserImplement implements UserService
     { return UserDTOListMapper(userRepo.findAll()); }
 
     @Override
-    public List<UserDTO> getUserbyName(String firstname)
-    { return UserDTOListMapper(userRepo.findByfirstname(firstname)); }
-
-   public List<UserDTO> getUserbyName(String firstname, String middlename, String lastname)
-    { return UserDTOListMapper(userRepo.findByfullname(firstname, middlename, lastname)); }
+    public List<String> getUserbyName(String firstname)
+    { return userRepo.findByfirstname(firstname); }
 
     @Override
-    public List<UserDTO> getUserbyEmail(String email_id)
-    { return UserDTOListMapper(userRepo.findByEmailId(email_id)); }
+    public List<String> getUserbyName(String firstname, String middlename, String lastname)
+    { return userRepo.findByfullname(firstname, middlename, lastname); }
+
+    @Override
+    public List<String> getUserbyEmail(String email_id)
+    { return userRepo.findByEmailId(email_id); }
 
     @Override
     public void DeleteUser(String username)

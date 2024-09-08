@@ -1,9 +1,10 @@
 package com.DevConnect.BE.Service;
 
-
 import com.DevConnect.BE.DataTransfer.UserDTO;
+import org.springframework.stereotype.Service;
 import java.util.List;
 
+@Service
 public interface UserService
 {
     UserDTO CreateUser(UserDTO newUser);
@@ -17,9 +18,9 @@ public interface UserService
     UserDTO RemoveEmailId(String username, String EmailId);
     UserDTO RemoveAllEmailId(String username);
 
-    UserDTO AddMobileNo(String username, int MobileNo);
-    UserDTO ReplaceMobileNo(String username, int oldMobileNo, int newMobileNo);
-    UserDTO RemoveMobileNo(String username, int MobileNo);
+    UserDTO AddMobileNo(String username, long MobileNo);
+    UserDTO ReplaceMobileNo(String username, long oldMobileNo, long newMobileNo);
+    UserDTO RemoveMobileNo(String username, long MobileNo);
     UserDTO RemoveAllMobileNo(String username);
 
     UserDTO UpdateQualifications(String username, String Qualification);
@@ -29,10 +30,10 @@ public interface UserService
     UserDTO getUser(String username);
     List<UserDTO> getAllUsers();
 
-    List<UserDTO> getUserbyName(String firstname);
-    List<UserDTO> getUserbyName(String firstname, String middlename, String lastname);
+    List<String> getUserbyName(String firstname);
+    List<String> getUserbyName(String firstname, String middlename, String lastname);
 
-    List<UserDTO> getUserbyEmail(String email_id);
+    List<String> getUserbyEmail(String email_id);
 
     void DeleteUser(String username);
 }
