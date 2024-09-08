@@ -22,11 +22,10 @@ public class UserImplement implements UserService
     private User FindUser(String username)
     { return userRepo.findById(username).orElseThrow(() -> new ResourceNotFoundException("User", "Username", username)); }
 
-    private UserDTO SaveUser(UserDTO Updated_User) //needs testing probably doesnt work as intended
+    private UserDTO SaveUser(User Updated_User) //needs testing probably doesnt work as intended
     {
-        User user = mapper.map(Updated_User, User.class);
-        userRepo.save(user);
-        return mapper.map(user, UserDTO.class);
+        userRepo.save(Updated_User);
+        return mapper.map(Updated_User, UserDTO.class);
     }
 
     private List<UserDTO> UserDTOListMapper(List<User> user_l)
@@ -38,16 +37,17 @@ public class UserImplement implements UserService
     }
 
     @Override
-    public UserDTO CreateUser(UserDTO newUser)
+    public UserDTO AddUser(User newUser)
     {
         return SaveUser(newUser);
     }
 
     @Override
-    public UserDTO UpdateUser(UserDTO Updated_User, String username)
+    public UserDTO UpdateUser(UserDTO updatedUser, String username)
     {
         User user = FindUser(username);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        user = mapper.map(updatedUser, User.class);
+        return SaveUser(user);
     }
 
     @Override
@@ -55,55 +55,55 @@ public class UserImplement implements UserService
     {
         User user = FindUser(username);
         UserDTO userdt = mapper.map(user, UserDTO.class);
-        userdt.setUsername(newUsername);//check for newusername not being unique later
+        userdt.setUsername(newUsername);
         DeleteUser(username);
-        return CreateUser(userdt);
+        return SaveUser(mapper.map(userdt, User.class));
     }
 
     @Override
-    public UserDTO UpdateUserPassword(String username, String password)
+    public void UpdateUserPassword(String username, String password)
     {
         User user = FindUser(username);
         user.setPassword(password);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        SaveUser(user);
     }
 
     @Override
-    public UserDTO AddEmailId(String username, String emailid)
+    public UserDTO AddEmailId(String username, String emailId)
     {
         User user = FindUser(username);
         List<String> AllEmails = user.getEmail_id();
-        AllEmails.add(emailid);
+        AllEmails.add(emailId);
         user.setEmail_id(AllEmails);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
-    public UserDTO ReplaceEmailId(String username, String oldEmailId, String newEmailId)
+    public UserDTO UpdateEmailId(String username, String oldEmailId, String newEmailId)
     {
         User user = FindUser(username);
         List<String> allEmails = user.getEmail_id();
         allEmails.set(allEmails.indexOf(oldEmailId), newEmailId);//Check for oldemailid not existing
         user.setEmail_id(allEmails);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
-    public UserDTO RemoveEmailId(String username, String EmailId)
+    public UserDTO DeleteEmailId(String username, String EmailId)
     {
         User user = FindUser(username);
         List<String> allEmails = user.getEmail_id();
         allEmails.remove(EmailId);
         user.setEmail_id(allEmails);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
-    public UserDTO RemoveAllEmailId(String username)
+    public UserDTO DeleteAllEmailId(String username)
     {
         User user = FindUser(username);
         user.setEmail_id(new ArrayList<>());
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
@@ -113,35 +113,35 @@ public class UserImplement implements UserService
         List<Long> AllMob = user.getMobile_no();
         AllMob.add(MobileNo);
         user.setMobile_no(AllMob);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
-    public UserDTO ReplaceMobileNo(String username, long oldMobileNo, long newMobileNo)
+    public UserDTO UpdateMobileNo(String username, long oldMobileNo, long newMobileNo)
     {
         User user = FindUser(username);
         List<Long> AllMob = user.getMobile_no();
         AllMob.set(AllMob.indexOf(oldMobileNo), newMobileNo);
         user.setMobile_no(AllMob);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
-    public UserDTO RemoveMobileNo(String username, long MobileNo)
+    public UserDTO DeleteMobileNo(String username, long MobileNo)
     {
         User user = FindUser(username);
         List<Long> AllMob = user.getMobile_no();
         AllMob.remove(MobileNo);
         user.setMobile_no(AllMob);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
-    public UserDTO RemoveAllMobileNo(String username)
+    public UserDTO DeleteAllMobileNo(String username)
     {
         User user = FindUser(username);
         user.setMobile_no(new ArrayList<>());
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
@@ -149,39 +149,41 @@ public class UserImplement implements UserService
     {
         User user = FindUser(username);
         user.setQualifications(Qualification);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        return SaveUser(user);
     }
 
     @Override
-    public UserDTO UpdateDomainInterest(String username, String domain)
+    public UserDTO AddInterest(String username, String interest)
     {
         User user = FindUser(username);
-        user.setDomain_interest(domain);
-        return SaveUser(mapper.map(user, UserDTO.class));
+        List<String> Interest = user.getInterest();
+        Interest.add(interest);
+        user.setInterest(Interest);
+        return SaveUser(user);
     }
 
     @Override
-    public UserDTO getUser(String username)
+    public UserDTO GetUser(String username)
     {
         User user = FindUser(username);
         return mapper.map(user, UserDTO.class);
     }
 
     @Override
-    public List<UserDTO> getAllUsers()
+    public List<UserDTO> GetAllUsers()
     { return UserDTOListMapper(userRepo.findAll()); }
 
     @Override
-    public List<String> getUserbyName(String firstname)
-    { return userRepo.findByfirstname(firstname); }
+    public List<UserDTO> GetUserByName(String firstname)
+    { return UserDTOListMapper(userRepo.findByfirstname(firstname)); }
 
     @Override
-    public List<String> getUserbyName(String firstname, String middlename, String lastname)
-    { return userRepo.findByfullname(firstname, middlename, lastname); }
+    public List<UserDTO> GetUserByName(String firstname, String middlename, String lastname)
+    { return UserDTOListMapper(userRepo.findByfullname(firstname, middlename, lastname)); }
 
     @Override
-    public List<String> getUserbyEmail(String email_id)
-    { return userRepo.findByEmailId(email_id); }
+    public List<UserDTO> GetUserByEmail(String email_id)
+    { return UserDTOListMapper(userRepo.findByEmailId(email_id)); }
 
     @Override
     public void DeleteUser(String username)

@@ -9,10 +9,11 @@ public class Listing
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int Id;
 
-    private String Details;
+    @OneToOne
+    private Project listedProject;
 
-    @Column(nullable = false)
-    private String Domain;
+    @ManyToOne
+    private User Lister;
 
     @Column(nullable = false, length = 10)
     private String Date;

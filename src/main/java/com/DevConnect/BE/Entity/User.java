@@ -28,17 +28,14 @@ public class User
     private String middle_name;
     private String last_name;
 
-//    @OneToMany
-//    @JoinColumn(name="email_id")
     @ElementCollection
     private List<String> email_id;
 
-//    @OneToMany
-//    @JoinColumn(name="mobile_no")
     @ElementCollection
     private List<Long> mobile_no;
-    
-    private String qualifications;
 
-    private String domain_interest;
+    @ElementCollection
+    private List<String> interest;
+
+    private String qualifications;
 }

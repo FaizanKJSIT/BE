@@ -18,6 +18,6 @@ public class UserDTO
     private String last_name;
     private List<String> email_id;
     private List<Long> mobile_no;
+    private List<String> interest;
     private String qualifications;
-    private String domain_interest;
 }

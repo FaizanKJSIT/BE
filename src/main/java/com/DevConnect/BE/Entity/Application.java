@@ -9,10 +9,11 @@ public class Application
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int Id;
 
-    @Column(nullable = false)
-    private String Qualifications;
+    @ManyToOne
+    private User Applicant;
 
-    //Need To add project id of project applied, roles applied for
+    @OneToOne
+    private Project AppliedProject;
 
     @Column(nullable = false, length = 10)
     private String Date;
