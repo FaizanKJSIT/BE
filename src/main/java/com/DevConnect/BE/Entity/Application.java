@@ -7,14 +7,14 @@ public class Application
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int Id;
+    private int id;
 
     @ManyToOne
-    private User Applicant;
+    private User applicant;
 
     @OneToOne
-    private Project AppliedProject;
+    private Project applied_project;
 
     @Column(nullable = false, length = 10)
-    private String Date;
+    private String date;
 }

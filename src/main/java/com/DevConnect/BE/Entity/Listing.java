@@ -7,14 +7,14 @@ public class Listing
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int Id;
+    private int id;
 
     @OneToOne
-    private Project listedProject;
+    private Project listed_project;
 
     @ManyToOne
-    private User Lister;
+    private User lister;
 
     @Column(nullable = false, length = 10)
-    private String Date;
+    private String date;
 }

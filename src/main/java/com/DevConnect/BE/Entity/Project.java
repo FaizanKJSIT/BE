@@ -8,23 +8,23 @@ public class Project
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int Id;
+    private Integer id;
 
     @ManyToMany
-    private List<User> Collaborators;
+    private List<User> collaborators;
 
     @Column(nullable = false)
-    private String Name;
+    private String name;
 
-    private String Aim; //Aim of the project
-    private String Scope; //What will the project cover
-    private String Domain; //Domain of the project
-    private String Description; //Description of the project
-    private String Duration;  //How long is someone expected to be working on this project
-
-    @ElementCollection
-    private List<String> Roles; //Roles required in this project that someone will apply to
+    private String aim; //Aim of the project
+    private String scope; //What will the project cover
+    private String domain; //Domain of the project
+    private String description; //Description of the project
+    private String duration;  //How long is someone expected to be working on this project
 
     @ElementCollection
-    private List<String> Categories; //All Categories
+    private List<String> roles; //Roles required in this project that someone will apply to
+
+    @ElementCollection
+    private List<String> categories; //All Categories
 }
