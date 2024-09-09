@@ -19,6 +19,11 @@ public class UserImplement implements UserService
 
     private ModelMapper mapper = new ModelMapper();
 
+    UserImplement()
+    {
+        mapper.typeMap(UserDTO.class, User.class).addMappings(mp -> {mp.skip(User::setPassword);});
+    }
+
     private User FindUser(String username)
     { return userRepo.findById(username).orElseThrow(() -> new ResourceNotFoundException("User", "Username", username)); }
 
@@ -46,18 +51,23 @@ public class UserImplement implements UserService
     public UserDTO UpdateUser(UserDTO updatedUser, String username)
     {
         User user = FindUser(username);
+        String pass = user.getPassword();
         user = mapper.map(updatedUser, User.class);
+        user.setPassword(pass);
         return SaveUser(user);
     }
 
     @Override
     public UserDTO UpdateUsername(String username, String newUsername)
     {
-        User user = FindUser(username);
-        UserDTO userdt = mapper.map(user, UserDTO.class);
-        userdt.setUsername(newUsername);
-        DeleteUser(username);
-        return SaveUser(mapper.map(userdt, User.class));
+        User user = FindUser(username); //Get user
+        UserDTO userdt = mapper.map(user, UserDTO.class); //Copy details to data transfer object
+        String Password = user.getPassword(); //Save password in variable
+        userdt.setUsername(newUsername); //Set the new username in data transfer object
+        DeleteUser(username); //Delete the user (note user should be referencing null)
+        user = mapper.map(userdt, User.class); //Transfer the data back to user with new username
+        user.setPassword(Password); //Transfer back the old password
+        return SaveUser(user);
     }
 
     @Override
@@ -145,10 +155,10 @@ public class UserImplement implements UserService
     }
 
     @Override
-    public UserDTO UpdateQualifications(String username, String Qualification)
+    public UserDTO UpdateQualification(String username, String Qualification)
     {
         User user = FindUser(username);
-        user.setQualifications(Qualification);
+        user.setQualification(Qualification);
         return SaveUser(user);
     }
 

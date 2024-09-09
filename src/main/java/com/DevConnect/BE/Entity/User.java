@@ -37,5 +37,5 @@ public class User
     @ElementCollection
     private List<String> interest;
 
-    private String qualifications;
+    private String qualification;
 }

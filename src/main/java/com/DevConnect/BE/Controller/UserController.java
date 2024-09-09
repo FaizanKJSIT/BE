@@ -55,9 +55,9 @@ public class UserController
     public ResponseEntity<UserDTO> updateMobileNo(@PathVariable String username, @RequestParam(name = "NewMobileNo") Long newMob, @RequestParam(name = "OldMobileNo") Long mobno)
     { return new ResponseEntity<>(userService.UpdateMobileNo(username, mobno, newMob), HttpStatus.OK); }
 
-    @PutMapping("{username}/Qualifications/")
+    @PutMapping("{username}/Qualification/")
     public ResponseEntity<UserDTO> updateQualification(@RequestParam(name = "NewQualification") String qual, @PathVariable String username)
-    { return new ResponseEntity<>(userService.UpdateQualifications(username, qual), HttpStatus.OK); }
+    { return new ResponseEntity<>(userService.UpdateQualification(username, qual), HttpStatus.OK); }
 
     @GetMapping("All/")
     public ResponseEntity<List<UserDTO>> getAllUser()

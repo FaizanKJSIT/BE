@@ -28,7 +28,7 @@ public interface UserService
     UserDTO DeleteMobileNo(String username, long MobileNo);
     UserDTO DeleteAllMobileNo(String username);
 
-    UserDTO UpdateQualifications(String username, String Qualification);
+    UserDTO UpdateQualification(String username, String Qualification);
 
     UserDTO AddInterest(String username, String interest);
 

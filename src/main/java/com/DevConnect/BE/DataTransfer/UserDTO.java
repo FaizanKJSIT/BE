@@ -12,12 +12,12 @@ import java.util.List;
 public class UserDTO
 {
     private String username;
-    private String password;
+//    private String password;
     private String first_name;
     private String middle_name;
     private String last_name;
     private List<String> email_id;
     private List<Long> mobile_no;
     private List<String> interest;
-    private String qualifications;
+    private String qualification;
 }
