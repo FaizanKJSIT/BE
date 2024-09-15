@@ -9,7 +9,7 @@ public class Listing
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Project listed_project;
 
     @ManyToOne

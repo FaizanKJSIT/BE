@@ -13,3 +13,5 @@ public class ResourceNotFoundException extends RuntimeException
         this.field_value = field_value;
     }
 }
+/*Not possible to include generics for exceptions and I have no interest in creating multiple classes,
+ so simply convert to string and pass to field_value parameter while throwing*/
