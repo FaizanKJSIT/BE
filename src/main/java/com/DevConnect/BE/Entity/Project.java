@@ -1,8 +1,12 @@
 package com.DevConnect.BE.Entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 public class Project
 {
@@ -11,7 +15,7 @@ public class Project
     private Integer id;
 
     @ManyToMany
-    private List<User> collaborators;
+    private List<User> collaborator;
 
     @Column(nullable = false)
     private String name;
@@ -20,11 +24,10 @@ public class Project
     private String scope; //What will the project cover
     private String domain; //Domain of the project
     private String description; //Description of the project
-    private String duration;  //How long is someone expected to be working on this project
 
     @ElementCollection
-    private List<String> roles; //Roles required in this project that someone will apply to
+    private List<String> role; //Roles required in this project that someone will apply to
 
     @ElementCollection
-    private List<String> categories; //All Categories
+    private List<String> category; //All Categories
 }

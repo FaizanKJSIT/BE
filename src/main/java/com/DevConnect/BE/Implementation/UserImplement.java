@@ -5,8 +5,10 @@ import com.DevConnect.BE.Entity.User;
 import com.DevConnect.BE.ExceptionH.*;
 import com.DevConnect.BE.Repo.UserRepo;
 import com.DevConnect.BE.Service.UserService;
+import com.DevConnect.BE.Utility.ModelMapperConfig;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +21,13 @@ public class UserImplement implements UserService
 
     private ModelMapper mapper = new ModelMapper();
 
-    UserImplement()
+    public UserImplement()
     {
-        mapper.typeMap(UserDTO.class, User.class).addMappings(mp -> {mp.skip(User::setPassword);});
+        ModelMapperConfig mmc = new ModelMapperConfig();
+        mapper = mmc.UserMapper();
     }
 
-    private User FindUser(String username)
+    public User FindUser(String username)
     { return userRepo.findById(username).orElseThrow(() -> new ResourceNotFoundException("User", "Username", username)); }
 
     private UserDTO SaveUser(User Updated_User) //needs testing probably doesnt work as intended
@@ -33,7 +36,7 @@ public class UserImplement implements UserService
         return mapper.map(Updated_User, UserDTO.class);
     }
 
-    private List<UserDTO> UserDTOListMapper(List<User> user_l)
+    public List<UserDTO> UserDTOListMapper(List<User> user_l)
     {
         List<UserDTO> userdto_l = new ArrayList<>(user_l.size());
         for(User u : user_l)
@@ -51,9 +54,12 @@ public class UserImplement implements UserService
     public UserDTO UpdateUser(UserDTO updatedUser, String username)
     {
         User user = FindUser(username);
-        String pass = user.getPassword();
-        user = mapper.map(updatedUser, User.class);
-        user.setPassword(pass);
+        if(updatedUser.getUsername().equals(username))
+        {
+            String pass = user.getPassword();
+            user = mapper.map(updatedUser, User.class);
+            user.setPassword(pass);
+        }
         return SaveUser(user);
     }
 
@@ -182,6 +188,19 @@ public class UserImplement implements UserService
     @Override
     public List<UserDTO> GetAllUsers()
     { return UserDTOListMapper(userRepo.findAll()); }
+
+    @Override
+    public UserDTO UpdateName(String username, String firstname, String middlename, String lastname)
+    {
+        User user = FindUser(username);
+        if(!firstname.equals(""))
+            user.setFirst_name(firstname);
+        if(!middlename.equals(""))
+            user.setMiddle_name(middlename);
+        if(!lastname.equals(""))
+            user.setLast_name(lastname);
+        return SaveUser(user);
+    }
 
     @Override
     public List<UserDTO> GetUserByName(String firstname)

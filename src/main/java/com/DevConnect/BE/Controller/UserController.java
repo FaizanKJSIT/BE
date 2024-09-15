@@ -47,6 +47,10 @@ public class UserController
         return new ResponseEntity<>("User " + username + "'s password is updated", HttpStatus.OK);
     }
 
+    @PutMapping("{username}/Name/")
+    public ResponseEntity<UserDTO> updateName(@PathVariable String username, @RequestParam(name = "FirstName") String firstname, @RequestParam(name = "MiddleName") String middlename, @RequestParam(name = "LastName") String lastname)
+    { return new ResponseEntity<>(userService.UpdateName(username, firstname, middlename, lastname), HttpStatus.OK); }
+
     @PutMapping("{username}/EmailId/")
     public ResponseEntity<UserDTO> updateEmailId(@PathVariable String username, @RequestParam(name = "NewEmailId") String newEmail, @RequestParam(name = "OldEmailId") String emailid)
     { return new ResponseEntity<>(userService.UpdateEmailId(username, emailid, newEmail), HttpStatus.OK); }

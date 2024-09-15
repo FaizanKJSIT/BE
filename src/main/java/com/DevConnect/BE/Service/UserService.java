@@ -32,6 +32,7 @@ public interface UserService
 
     UserDTO AddInterest(String username, String interest);
 
+    UserDTO UpdateName(String username, String firstname, String middlename, String lastname);
     List<UserDTO> GetUserByName(String firstname);
     List<UserDTO> GetUserByName(String firstname, String middlename, String lastname);
 }
