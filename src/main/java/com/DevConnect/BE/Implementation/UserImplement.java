@@ -77,10 +77,12 @@ public class UserImplement implements UserService
     }
 
     @Override
-    public void UpdateUserPassword(String username, String password)
+    public void UpdateUserPassword(String username, String password, String newPassword)
     {
+        if(!Authenticate(username, password))
+            throw new AuthenticateFailureException(username);
         User user = FindUser(username);
-        user.setPassword(password);
+        user.setPassword(newPassword);
         SaveUser(user);
     }
 
@@ -123,30 +125,30 @@ public class UserImplement implements UserService
     }
 
     @Override
-    public UserDTO AddMobileNo(String username, long MobileNo)
+    public UserDTO AddMobileNo(String username, String MobileNo)
     {
         User user = FindUser(username);
-        List<Long> AllMob = user.getMobile_no();
+        List<String> AllMob = user.getMobile_no();
         AllMob.add(MobileNo);
         user.setMobile_no(AllMob);
         return SaveUser(user);
     }
 
     @Override
-    public UserDTO UpdateMobileNo(String username, long oldMobileNo, long newMobileNo)
+    public UserDTO UpdateMobileNo(String username, String oldMobileNo, String newMobileNo)
     {
         User user = FindUser(username);
-        List<Long> AllMob = user.getMobile_no();
+        List<String> AllMob = user.getMobile_no();
         AllMob.set(AllMob.indexOf(oldMobileNo), newMobileNo);
         user.setMobile_no(AllMob);
         return SaveUser(user);
     }
 
     @Override
-    public UserDTO DeleteMobileNo(String username, long MobileNo)
+    public UserDTO DeleteMobileNo(String username, String MobileNo)
     {
         User user = FindUser(username);
-        List<Long> AllMob = user.getMobile_no();
+        List<String> AllMob = user.getMobile_no();
         AllMob.remove(MobileNo);
         user.setMobile_no(AllMob);
         return SaveUser(user);
@@ -217,4 +219,10 @@ public class UserImplement implements UserService
     @Override
     public void DeleteUser(String username)
     { userRepo.deleteById(username); }
+
+    public boolean Authenticate(String username, String password)
+    {
+        User user = FindUser(username);
+        return user.getPassword().equals(password);
+    }
 }

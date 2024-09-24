@@ -32,7 +32,7 @@ public class User
     private List<String> email_id;
 
     @ElementCollection
-    private List<Long> mobile_no;
+    private List<String> mobile_no;
 
     @ElementCollection
     private List<String> interest;
