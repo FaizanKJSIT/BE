@@ -4,6 +4,7 @@ import com.DevConnect.BE.DataTransfer.UserDTO;
 import com.DevConnect.BE.Entity.User;
 import com.DevConnect.BE.ExceptionH.AuthenticateFailureException;
 import com.DevConnect.BE.Service.UserService;
+import com.DevConnect.BE.Utility.SimpleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -42,10 +43,10 @@ public class UserController
     { return new ResponseEntity<>(userService.UpdateUsername(username, newUsername), HttpStatus.OK); }
 
     @PutMapping("{username}/Password/")
-    public ResponseEntity<?> updatePassword(@PathVariable String username, @RequestParam(name = "OldPassword") String password, @RequestParam(name = "NewPassword") String newpassword)
+    public ResponseEntity<SimpleResponse> updatePassword(@PathVariable String username, @RequestParam(name = "OldPassword") String password, @RequestParam(name = "NewPassword") String newpassword)
     {
         userService.UpdateUserPassword(username, password, newpassword);
-        return new ResponseEntity<>("User " + username + "'s password is updated", HttpStatus.OK);
+        return new ResponseEntity<>(new SimpleResponse("User " + username + "'s password is updated", true), HttpStatus.OK);
     }
 
     @PutMapping("{username}/Name/")
@@ -85,18 +86,18 @@ public class UserController
     { return new ResponseEntity<>(userService.GetUserByEmail(email), HttpStatus.OK); }
 
     @GetMapping("Authenticate/{username}/")
-    public ResponseEntity<?> login(@PathVariable String username, @RequestParam("Password") String password)
+    public ResponseEntity<SimpleResponse> login(@PathVariable String username, @RequestParam("Password") String password)
     {
         if(!userService.Authenticate(username, password))
             throw new AuthenticateFailureException(username);
-        return new ResponseEntity<>("User " + username + " Authenticated", HttpStatus.OK);
+        return new ResponseEntity<>(new SimpleResponse("User " + username + " Authenticated", true), HttpStatus.OK);
     }
 
     @DeleteMapping("{username}/")
-    public ResponseEntity<?> deleteUser(@PathVariable String username)
+    public ResponseEntity<SimpleResponse> deleteUser(@PathVariable String username)
     {
         userService.DeleteUser(username);
-        return new ResponseEntity<>("User " + username + " deleted successfully", HttpStatus.OK);
+        return new ResponseEntity<>(new SimpleResponse("User " + username + " deleted successfully", true), HttpStatus.OK);
     }
 
     @DeleteMapping("{username}/EmailId/{emailid}/")

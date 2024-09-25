@@ -2,6 +2,7 @@ package com.DevConnect.BE.Controller;
 
 import com.DevConnect.BE.DataTransfer.ProjectDTO;
 import com.DevConnect.BE.Service.ProjectService;
+import com.DevConnect.BE.Utility.SimpleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,10 +96,10 @@ public class ProjectController
 
     //DELETE MAPPINGS
     @DeleteMapping("{id}/")
-    public ResponseEntity<?> deleteProject(@PathVariable Integer id)
+    public ResponseEntity<SimpleResponse> deleteProject(@PathVariable Integer id)
     {
         projectService.DeleteProject(id);
-        return new ResponseEntity<>("Project " + id + " deleted successfully", HttpStatus.OK);
+        return new ResponseEntity<>(new SimpleResponse("Project " + id + " deleted successfully", true), HttpStatus.OK);
     }
 
     @DeleteMapping("{id}/Collaborator/{username}/")

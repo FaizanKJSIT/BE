@@ -3,6 +3,7 @@ package com.DevConnect.BE.Implementation;
 import com.DevConnect.BE.DataTransfer.ProjectDTO;
 import com.DevConnect.BE.Entity.Project;
 import com.DevConnect.BE.Entity.User;
+import com.DevConnect.BE.ExceptionH.AlreadyExistsException;
 import com.DevConnect.BE.ExceptionH.ResourceNotFoundException;
 import com.DevConnect.BE.Repo.ProjectRepo;
 import com.DevConnect.BE.Service.ProjectService;
@@ -43,7 +44,7 @@ public class ProjectImplement implements ProjectService
         return  projectDTO_l;
     }
 
-    private ModelMapper MapperConfig()
+    private ModelMapper MapperConfig()//Would love to shift this into config but userRepo autowiring doesnt seem to work in Utility
     {
         ModelMapper mapper = new ModelMapper();
         Converter<List<User>, List<String>> UserToUsername = ctx -> ctx.getSource() == null ? null : getUsername(ctx.getSource());
@@ -73,7 +74,19 @@ public class ProjectImplement implements ProjectService
 
     @Override
     public ProjectDTO AddProject(ProjectDTO project)
-    { return SaveProject(mapper.map(project, Project.class)); }
+    {
+        try
+        {
+            if(project.getId() == null)
+                throw new ResourceNotFoundException("", "", "");
+            FindProject(project.getId());
+        }
+        catch(ResourceNotFoundException r)
+        {
+            return SaveProject(mapper.map(project, Project.class));
+        }
+        throw new AlreadyExistsException("Project", project.getId().toString());
+    }
 
     @Override
     public ProjectDTO UpdateProject(ProjectDTO updatedProject, Integer id)
@@ -129,9 +142,14 @@ public class ProjectImplement implements ProjectService
     @Override
     public ProjectDTO AddCollaborator(Integer id, String username)
     {
-        User newUser = userRepo.FindUser(username);
         Project project = FindProject(id);
         List<User> collaborator = project.getCollaborator();
+        for(User c : collaborator)
+        {
+            if(c.getUsername().equals(username))
+                throw new AlreadyExistsException("Collaborator", username);
+        }
+        User newUser = userRepo.FindUser(username);
         collaborator.add(newUser);
         project.setCollaborator(collaborator);
         return SaveProject(project);
@@ -140,13 +158,8 @@ public class ProjectImplement implements ProjectService
     @Override
     public ProjectDTO UpdateCollaborator(Integer id, String oldColUsername, String newColUsername)
     {
-        User oldUser = userRepo.FindUser(oldColUsername);
-        User newUser = userRepo.FindUser(newColUsername);
-        Project project = FindProject(id);
-        List<User> collaborator = project.getCollaborator();
-        collaborator.set(collaborator.indexOf(oldUser), newUser);
-        project.setCollaborator(collaborator);
-        return SaveProject(project);
+        DeleteCollaborator(id, oldColUsername);
+        return AddCollaborator(id, newColUsername);
     }
 
     @Override
@@ -158,7 +171,10 @@ public class ProjectImplement implements ProjectService
     {
         Project project = FindProject(id);
         List<User> collaborator= project.getCollaborator();
-        collaborator.remove(collaborator.indexOf(userRepo.FindUser(username)));
+        int index = collaborator.indexOf(userRepo.FindUser(username));
+        if(index == -1)
+            throw new ResourceNotFoundException("Collaborator", "Username", username);
+        collaborator.remove(index);
         return SaveProject(project);
     }
 
