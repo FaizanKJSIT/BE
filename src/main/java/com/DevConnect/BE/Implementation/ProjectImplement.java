@@ -6,6 +6,7 @@ import com.DevConnect.BE.Entity.User;
 import com.DevConnect.BE.ExceptionH.ResourceNotFoundException;
 import com.DevConnect.BE.Repo.ProjectRepo;
 import com.DevConnect.BE.Service.ProjectService;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,19 +20,21 @@ public class ProjectImplement implements ProjectService
     @Autowired
     ProjectRepo projectRepo;
 
-    UserImplement userRepo = new UserImplement();
+    @Autowired
+    UserImplement userRepo;
 
-    ModelMapper mapper = new ModelMapper();
+    ModelMapper mapper;
+
+    ProjectImplement()
+    { mapper = MapperConfig(); }
 
     private Project FindProject(Integer id)
     { return projectRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", id.toString())); }
-
     private ProjectDTO SaveProject(Project project)
     {
         projectRepo.save(project);
         return mapper.map(project, ProjectDTO.class);
     }
-
     private List<ProjectDTO> ProjectListMapper(List<Project> project_l)
     {
         List<ProjectDTO> projectDTO_l = new ArrayList<>(project_l.size());
@@ -40,15 +43,43 @@ public class ProjectImplement implements ProjectService
         return  projectDTO_l;
     }
 
+    private ModelMapper MapperConfig()
+    {
+        ModelMapper mapper = new ModelMapper();
+        Converter<List<User>, List<String>> UserToUsername = ctx -> ctx.getSource() == null ? null : getUsername(ctx.getSource());
+        mapper.typeMap(Project.class, ProjectDTO.class).addMappings(mp -> mp.using(UserToUsername).map(Project::getCollaborator, ProjectDTO::setCollaborator));
+
+        Converter<List<String>, List<User>> UsernameToUser = ctx -> ctx.getSource() == null ? null : getUser(ctx.getSource());
+        mapper.typeMap(ProjectDTO.class, Project.class).addMappings(mp -> mp.using(UsernameToUser).map(ProjectDTO::getCollaborator, Project::setCollaborator));
+        return mapper;
+    }
+    private List<String> getUsername(List<User> users)
+    {
+        List<String> username = new ArrayList<>(users.size());
+        for(User u : users)
+            username.add(u.getUsername());
+        return username;
+    }
+    private List<User> getUser(List<String> username)
+    {
+        List<User> users = new ArrayList<>(username.size());
+        for (String s : username)
+        {
+            User u = userRepo.FindUser(s);
+            users.add(u);
+        }
+        return users;
+    }
+
     @Override
-    public ProjectDTO AddProject(Project project)
-    { return SaveProject(project); }
+    public ProjectDTO AddProject(ProjectDTO project)
+    { return SaveProject(mapper.map(project, Project.class)); }
 
     @Override
     public ProjectDTO UpdateProject(ProjectDTO updatedProject, Integer id)
     {
         Project project = FindProject(id);
-        if(updatedProject.getId() == id)
+        if(updatedProject.getId().equals(id))
             project = mapper.map(updatedProject, Project.class);
         return SaveProject(project);
     }
@@ -79,7 +110,14 @@ public class ProjectImplement implements ProjectService
         User user = userRepo.FindUser(username);
         List<ProjectDTO> PerfectMatch = GetProjectByCategoryE(user.getInterest());
         List<ProjectDTO> PartialMatch = GetProjectByCategoryI(user.getInterest());
-        PartialMatch.removeAll(PerfectMatch);
+        for(int i = 0; i < PartialMatch.size(); i++)
+        {
+            for(ProjectDTO match : PerfectMatch)
+            {
+                if(PartialMatch.get(i).getId().equals(match.getId()))
+                    PartialMatch.remove(i);
+            }
+        }
         PerfectMatch.addAll(PartialMatch);
         return PerfectMatch;
     }

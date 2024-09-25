@@ -15,7 +15,7 @@ public interface UserService
     void DeleteUser(String username);
 
     UserDTO UpdateUsername(String username, String newUsername);
-    void UpdateUserPassword(String username, String password);
+    void UpdateUserPassword(String username, String password, String newPassword);
 
     UserDTO AddEmailId(String username, String emailId);
     UserDTO UpdateEmailId(String username, String oldEmailId, String newEmailId);
@@ -23,9 +23,9 @@ public interface UserService
     UserDTO DeleteEmailId(String username, String EmailId);
     UserDTO DeleteAllEmailId(String username);
 
-    UserDTO AddMobileNo(String username, long MobileNo);
-    UserDTO UpdateMobileNo(String username, long oldMobileNo, long newMobileNo);
-    UserDTO DeleteMobileNo(String username, long MobileNo);
+    UserDTO AddMobileNo(String username, String MobileNo);
+    UserDTO UpdateMobileNo(String username, String oldMobileNo, String newMobileNo);
+    UserDTO DeleteMobileNo(String username, String MobileNo);
     UserDTO DeleteAllMobileNo(String username);
 
     UserDTO UpdateQualification(String username, String Qualification);
@@ -35,4 +35,5 @@ public interface UserService
     UserDTO UpdateName(String username, String firstname, String middlename, String lastname);
     List<UserDTO> GetUserByName(String firstname);
     List<UserDTO> GetUserByName(String firstname, String middlename, String lastname);
+    boolean Authenticate(String username, String password);
 }

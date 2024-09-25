@@ -2,6 +2,7 @@ package com.DevConnect.BE.Controller;
 
 import com.DevConnect.BE.DataTransfer.UserDTO;
 import com.DevConnect.BE.Entity.User;
+import com.DevConnect.BE.ExceptionH.AuthenticateFailureException;
 import com.DevConnect.BE.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -25,7 +26,7 @@ public class UserController
     { return new ResponseEntity<>(userService.AddEmailId(username, email), HttpStatus.CREATED); }
 
     @PostMapping("{username}/MobileNo/")
-    public ResponseEntity<UserDTO> addMobileNo(@PathVariable String username, @RequestParam(name = "NewMobileNo") Long mobno)
+    public ResponseEntity<UserDTO> addMobileNo(@PathVariable String username, @RequestParam(name = "NewMobileNo") String mobno)
     { return new ResponseEntity<>(userService.AddMobileNo(username, mobno), HttpStatus.CREATED); }
 
     @PostMapping("{username}/Interest/")
@@ -41,9 +42,9 @@ public class UserController
     { return new ResponseEntity<>(userService.UpdateUsername(username, newUsername), HttpStatus.OK); }
 
     @PutMapping("{username}/Password/")
-    public ResponseEntity<?> updatePassword(@PathVariable String username, @RequestParam(name = "NewPassword") String password)
+    public ResponseEntity<?> updatePassword(@PathVariable String username, @RequestParam(name = "OldPassword") String password, @RequestParam(name = "NewPassword") String newpassword)
     {
-        userService.UpdateUserPassword(username, password);
+        userService.UpdateUserPassword(username, password, newpassword);
         return new ResponseEntity<>("User " + username + "'s password is updated", HttpStatus.OK);
     }
 
@@ -56,7 +57,7 @@ public class UserController
     { return new ResponseEntity<>(userService.UpdateEmailId(username, emailid, newEmail), HttpStatus.OK); }
 
     @PutMapping("{username}/MobileNo/")
-    public ResponseEntity<UserDTO> updateMobileNo(@PathVariable String username, @RequestParam(name = "NewMobileNo") Long newMob, @RequestParam(name = "OldMobileNo") Long mobno)
+    public ResponseEntity<UserDTO> updateMobileNo(@PathVariable String username, @RequestParam(name = "NewMobileNo") String newMob, @RequestParam(name = "OldMobileNo") String mobno)
     { return new ResponseEntity<>(userService.UpdateMobileNo(username, mobno, newMob), HttpStatus.OK); }
 
     @PutMapping("{username}/Qualification/")
@@ -83,6 +84,14 @@ public class UserController
     public ResponseEntity<List<UserDTO>> getUserbyEmail(@PathVariable String email)
     { return new ResponseEntity<>(userService.GetUserByEmail(email), HttpStatus.OK); }
 
+    @GetMapping("Authenticate/{username}/")
+    public ResponseEntity<?> login(@PathVariable String username, @RequestParam("Password") String password)
+    {
+        if(!userService.Authenticate(username, password))
+            throw new AuthenticateFailureException(username);
+        return new ResponseEntity<>("User " + username + " Authenticated", HttpStatus.OK);
+    }
+
     @DeleteMapping("{username}/")
     public ResponseEntity<?> deleteUser(@PathVariable String username)
     {
@@ -99,7 +108,7 @@ public class UserController
     { return new ResponseEntity<>(userService.DeleteAllEmailId(username), HttpStatus.OK); }
 
     @DeleteMapping("{username}/MobileNo/{mobno}/")
-    public ResponseEntity<UserDTO> deleteMobileNo(@PathVariable String username, @PathVariable Long mobno)
+    public ResponseEntity<UserDTO> deleteMobileNo(@PathVariable String username, @PathVariable String mobno)
     { return new ResponseEntity<>(userService.DeleteMobileNo(username, mobno), HttpStatus.OK); }
 
     @DeleteMapping("{username}/MobileNo/All/")

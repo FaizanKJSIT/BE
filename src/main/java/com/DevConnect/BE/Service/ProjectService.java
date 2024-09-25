@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public interface ProjectService
 {
-    ProjectDTO AddProject(Project project);
+    ProjectDTO AddProject(ProjectDTO project);
     ProjectDTO UpdateProject(ProjectDTO updatedProject, Integer id);
     ProjectDTO GetProject(Integer id);
     List<ProjectDTO> GetAllProject();

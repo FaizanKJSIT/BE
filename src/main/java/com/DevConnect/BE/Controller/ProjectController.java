@@ -1,7 +1,6 @@
 package com.DevConnect.BE.Controller;
 
 import com.DevConnect.BE.DataTransfer.ProjectDTO;
-import com.DevConnect.BE.Entity.Project;
 import com.DevConnect.BE.Service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,7 @@ public class ProjectController
 
     //POST MAPPINGS
     @PostMapping("Add/")
-    public ResponseEntity<ProjectDTO> addProject(@RequestBody Project project)
+    public ResponseEntity<ProjectDTO> addProject(@RequestBody ProjectDTO project)
     { return new ResponseEntity<>(projectService.AddProject(project), HttpStatus.CREATED); }
 
     @PostMapping("{id}/Collaborator/")
