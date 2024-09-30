@@ -15,6 +15,10 @@ public class Application
     @OneToOne
     private Project applied_project;
 
+    private String applied_role;
+
+    private String status;
+
     @Column(nullable = false, length = 10)
     private String date;
 }

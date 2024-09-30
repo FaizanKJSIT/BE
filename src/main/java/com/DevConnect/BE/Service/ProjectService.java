@@ -21,6 +21,9 @@ public interface ProjectService
       Useful for recommendation page/front page for users*/
     void DeleteProject(Integer id);
 
+    ProjectDTO UpdateStatus(Integer id, String status);
+    ProjectDTO UpdatePrivacyStatus(Integer id, String priv_status);
+
     ProjectDTO AddCollaborator(Integer id, String username);
     ProjectDTO UpdateCollaborator(Integer id, String oldColUsername, String newColUsername);
     List<String> GetAllCollaborator(Integer id);

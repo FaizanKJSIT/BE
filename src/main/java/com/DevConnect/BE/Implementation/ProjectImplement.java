@@ -277,4 +277,20 @@ public class ProjectImplement implements ProjectService
         project.setCategory(new ArrayList<>());
         return SaveProject(project);
     }
+
+    @Override
+    public ProjectDTO UpdateStatus(Integer id, String status)
+    {
+        Project project = FindProject(id);
+        project.setStatus(status);
+        return SaveProject(project);
+    }
+
+    @Override
+    public ProjectDTO UpdatePrivacyStatus(Integer id, String priv_status)
+    {
+        Project project = FindProject(id);
+        project.setPrivacy_status(priv_status);
+        return SaveProject(project);
+    }
 }

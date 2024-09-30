@@ -22,6 +22,8 @@ public class Project
 
     private String aim; //Aim of the project
     private String scope; //What will the project cover
+    private String status;
+    private String privacy_status;
     private String domain; //Domain of the project
     private String description; //Description of the project
 

@@ -56,6 +56,14 @@ public class ProjectController
     public ResponseEntity<ProjectDTO> updateDescription(@PathVariable Integer id, @RequestParam(name = "NewDescription") String desc)
     { return new ResponseEntity<>(projectService.UpdateDescription(id, desc), HttpStatus.OK); }
 
+    @PutMapping("{id}/Status/")
+    public ResponseEntity<ProjectDTO> updateStatus(@PathVariable Integer id, @RequestParam(name = "NewStatus") String status)
+    { return new ResponseEntity<>(projectService.UpdateStatus(id, status), HttpStatus.OK); }
+
+    @PutMapping("{id}/PrivacyStatus/")
+    public ResponseEntity<ProjectDTO> updatePrivacyStatus(@PathVariable Integer id, @RequestParam(name = "NewPrivacyStatus") String priv_status)
+    { return new ResponseEntity<>(projectService.UpdatePrivacyStatus(id, priv_status), HttpStatus.OK); }
+
     //GET MAPPINGS
     @GetMapping("Id/")
     public ResponseEntity<ProjectDTO> getById(@RequestParam(name = "Id") Integer id)

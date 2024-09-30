@@ -15,6 +15,8 @@ public class ProjectDTO
     private List<String> collaborator;
     private String name;
     private String aim;
+    private String status;
+    private String privacy_status;
     private String scope;
     private String domain;
     private String description;
