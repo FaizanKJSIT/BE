@@ -75,17 +75,11 @@ public class ProjectImplement implements ProjectService
     @Override
     public ProjectDTO AddProject(ProjectDTO project)
     {
-        try
-        {
-            if(project.getId() == null)
-                throw new ResourceNotFoundException("", "", "");
-            FindProject(project.getId());
-        }
-        catch(ResourceNotFoundException r)
-        {
+        boolean projectCheck = project.getId() == null || !projectRepo.existsById(project.getId());
+        if(projectCheck)
             return SaveProject(mapper.map(project, Project.class));
-        }
-        throw new AlreadyExistsException("Project", project.getId().toString());
+        else
+            throw new AlreadyExistsException("Project", project.getId().toString());
     }
 
     @Override
@@ -94,6 +88,8 @@ public class ProjectImplement implements ProjectService
         Project project = FindProject(id);
         if(updatedProject.getId().equals(id))
             project = mapper.map(updatedProject, Project.class);
+        else
+            throw new RuntimeException("Project Id and updated project id must be same!");
         return SaveProject(project);
     }
 

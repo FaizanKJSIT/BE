@@ -1,7 +1,6 @@
 package com.DevConnect.BE.Service;
 
 import com.DevConnect.BE.DataTransfer.ProjectDTO;
-import com.DevConnect.BE.Entity.Project;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

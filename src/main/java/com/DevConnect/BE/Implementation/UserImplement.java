@@ -46,15 +46,10 @@ public class UserImplement implements UserService
     @Override
     public UserDTO AddUser(User newUser)
     {
-        try
-        {
-            FindUser(newUser.getUsername());//If username doesnt exists throws exception
-        }
-        catch(ResourceNotFoundException r)
-        {
-            return SaveUser(newUser);//Safe to save as it doesnt exist
-        }
-        throw new AlreadyExistsException("User", newUser.getUsername());//else throw exception
+        if(!userRepo.existsById(newUser.getUsername()))
+            return SaveUser(newUser);
+        else
+            throw new AlreadyExistsException("User", newUser.getUsername());
     }
 
     @Override

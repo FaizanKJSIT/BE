@@ -1,7 +1,11 @@
 package com.DevConnect.BE.Entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 public class Application
 {
