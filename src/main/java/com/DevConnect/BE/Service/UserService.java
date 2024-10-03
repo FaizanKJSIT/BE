@@ -36,4 +36,5 @@ public interface UserService
     List<UserDTO> GetUserByName(String firstname);
     List<UserDTO> GetUserByName(String firstname, String middlename, String lastname);
     boolean Authenticate(String username, String password);
+    boolean IsUnique(String username);
 }

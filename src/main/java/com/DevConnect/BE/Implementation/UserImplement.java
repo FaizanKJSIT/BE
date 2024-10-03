@@ -222,9 +222,18 @@ public class UserImplement implements UserService
     public void DeleteUser(String username)
     { userRepo.deleteById(username); }
 
+    @Override
     public boolean Authenticate(String username, String password)
     {
         User user = FindUser(username);
         return user.getPassword().equals(password);
+    }
+
+    @Override
+    public boolean IsUnique(String username)
+    {
+        if(username == null || userRepo.existsById(username))
+            return false;
+        return true;
     }
 }

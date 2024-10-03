@@ -93,6 +93,15 @@ public class UserController
         return new ResponseEntity<>(new SimpleResponse("User " + username + " Authenticated", true), HttpStatus.OK);
     }
 
+    @GetMapping("Unique/")
+    public ResponseEntity<SimpleResponse> unique(@RequestParam("Username") String username)
+    {
+        if(userService.IsUnique(username))
+            return new ResponseEntity<>(new SimpleResponse("Username: " + username + " is unique", true), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(new SimpleResponse("Username: " + username +" is not unique", false), HttpStatus.CONFLICT);
+    }
+
     @DeleteMapping("{username}/")
     public ResponseEntity<SimpleResponse> deleteUser(@PathVariable String username)
     {
