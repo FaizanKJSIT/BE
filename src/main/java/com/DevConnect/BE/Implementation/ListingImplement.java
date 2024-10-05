@@ -3,6 +3,7 @@ package com.DevConnect.BE.Implementation;
 import com.DevConnect.BE.DataTransfer.ListingDTO;
 import com.DevConnect.BE.Entity.Listing;
 import com.DevConnect.BE.Entity.User;
+import com.DevConnect.BE.ExceptionH.AlreadyExistsException;
 import com.DevConnect.BE.ExceptionH.ResourceNotFoundException;
 import com.DevConnect.BE.Repo.ListingRepo;
 import com.DevConnect.BE.Service.ListingService;
@@ -69,8 +70,11 @@ public class ListingImplement implements ListingService
     @Override
     public ListingDTO AddListing(ListingDTO listing)
     {
-        Listing listingEntity = mapper.map(listing, Listing.class);
-        return SaveListing(listingEntity);
+        boolean listingCheck = listing.getId() == null || !listingRepo.existsById(listing.getId());
+        if(listingCheck)
+            return SaveListing(mapper.map(listing, Listing.class));
+        else
+            throw new AlreadyExistsException("Listing", listing.getId().toString());
     }
 
     @Override
