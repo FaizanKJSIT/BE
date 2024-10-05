@@ -9,9 +9,9 @@ import java.util.List;
 @Setter
 public class NotificationDTO
 {
-    private Integer id;
+    private Long id;
     private String message;
     private String receiver;
     private String type;
-    List<String> Data;
+    List<String> data;
 }

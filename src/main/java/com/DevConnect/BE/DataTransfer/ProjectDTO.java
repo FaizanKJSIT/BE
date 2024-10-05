@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ProjectDTO
 {
-    private Integer id;
+    private Long id;
     private List<String> collaborator;
     private String name;
     private String aim;

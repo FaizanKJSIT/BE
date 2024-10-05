@@ -14,7 +14,7 @@ public class Notification
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false)
     private String message;
@@ -25,5 +25,5 @@ public class Notification
     private String type;
 
     @ElementCollection
-    List<String> Data;
+    List<String> data;
 }

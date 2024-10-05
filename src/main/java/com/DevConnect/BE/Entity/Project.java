@@ -12,7 +12,7 @@ public class Project
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
 
     @ManyToMany
     private List<User> collaborator;
@@ -32,4 +32,7 @@ public class Project
 
     @ElementCollection
     private List<String> category; //All Categories
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "listed_project")
+    private Listing listing;
 }

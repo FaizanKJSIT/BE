@@ -8,7 +8,7 @@ import com.DevConnect.BE.ExceptionH.AlreadyExistsException;
 import com.DevConnect.BE.ExceptionH.ResourceNotFoundException;
 import com.DevConnect.BE.Repo.NotificationRepo;
 import com.DevConnect.BE.Service.NotificationService;
-import com.DevConnect.BE.Utility.ModelMapperConfig;
+import com.DevConnect.BE.Utility.SimpleResponse;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +26,9 @@ public class NotificationImplement implements NotificationService
     @Autowired
     UserImplement userRepo;
 
-    ModelMapper mapper;
+    private ModelMapper mapper;
 
-    private Notification FindNotification(Integer id)
+    private Notification FindNotification(Long id)
     { return notificationRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Notification", "Id", id.toString())); }
     private NotificationDTO SaveNotification(Notification noti)
     {
@@ -38,9 +38,7 @@ public class NotificationImplement implements NotificationService
 
     private ModelMapper NotificationConfig()
     {
-        ModelMapperConfig mmc = new ModelMapperConfig();
-        mapper = mmc.UserMapper();
-
+        mapper = new ModelMapper();
         Converter<User, String> UserToUsername = ctx -> ctx.getSource() == null ? null : ctx.getSource().getUsername();
         mapper.typeMap(Notification.class, NotificationDTO.class).addMappings(mp->mp.using(UserToUsername).map(Notification::getReceiver, NotificationDTO::setReceiver));
 
@@ -51,7 +49,9 @@ public class NotificationImplement implements NotificationService
     }
 
     public NotificationImplement()
-    { mapper = NotificationConfig(); }
+    {
+        mapper = NotificationConfig();
+    }
 
 
     @Override
@@ -65,15 +65,17 @@ public class NotificationImplement implements NotificationService
     }
 
     @Override
-    public NotificationDTO UpdateNotification(Integer id, NotificationDTO notiDTO)
+    public NotificationDTO UpdateNotification(Long id, NotificationDTO notiDTO)
     {
-        Notification noti = FindNotification(notiDTO.getId());
+        if(!notiDTO.getId().equals(id))
+            throw new RuntimeException("Notification id must be equal to passed id");
+        Notification noti = FindNotification(id);
         noti = mapper.map(notiDTO, Notification.class);
         return SaveNotification(noti);
     }
 
     @Override
-    public NotificationDTO UpdateReceiver(Integer id, String username)
+    public NotificationDTO UpdateReceiver(Long id, String username)
     {
         Notification noti = FindNotification(id);
         User user = userRepo.FindUser(username);
@@ -82,7 +84,7 @@ public class NotificationImplement implements NotificationService
     }
 
     @Override
-    public NotificationDTO UpdateMessage(Integer id, String message)
+    public NotificationDTO UpdateMessage(Long id, String message)
     {
         Notification noti = FindNotification(id);
         noti.setMessage(message);
@@ -90,7 +92,7 @@ public class NotificationImplement implements NotificationService
     }
 
     @Override
-    public NotificationDTO UpdateData(Integer id, List<String> data)
+    public NotificationDTO UpdateData(Long id, List<String> data)
     {
         Notification noti = FindNotification(id);
         noti.setData(data);
@@ -98,14 +100,14 @@ public class NotificationImplement implements NotificationService
     }
 
     @Override
-    public NotificationDTO GetNotification(Integer id)
+    public NotificationDTO GetNotification(Long id)
     {
         Notification noti = FindNotification(id);
         return mapper.map(noti, NotificationDTO.class);
     }
 
     @Override
-    public UserDTO GetReceiver(Integer id)
+    public UserDTO GetReceiver(Long id)
     {
         Notification noti = FindNotification(id);
         User user = noti.getReceiver();
@@ -124,6 +126,26 @@ public class NotificationImplement implements NotificationService
     }
 
     @Override
-    public void DeleteNotification(Integer id)
-    { notificationRepo.deleteById(id); }
+    public SimpleResponse DeleteNotification(Long id)
+    {
+        FindNotification(id);
+        notificationRepo.deleteById(id);
+        SimpleResponse response = new SimpleResponse("Notification with id: " +id + " deleted!", true);
+        if(notificationRepo.existsById(id))
+        {
+            response.setMessage("Failed to delete notification with id: " + id);
+            response.setSuccess(false);
+        }
+        return response;
+    }
+
+    @Override
+    public void DeleteAllForUser(String username)
+    {
+        List<NotificationDTO> notifications = GetAllForReceiver(username);
+        if(notifications.isEmpty())
+            return;
+        for(NotificationDTO noti : notifications)
+            DeleteNotification(noti.getId());
+    }
 }

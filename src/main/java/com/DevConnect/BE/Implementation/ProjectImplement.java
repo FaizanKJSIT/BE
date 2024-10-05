@@ -7,6 +7,7 @@ import com.DevConnect.BE.ExceptionH.AlreadyExistsException;
 import com.DevConnect.BE.ExceptionH.ResourceNotFoundException;
 import com.DevConnect.BE.Repo.ProjectRepo;
 import com.DevConnect.BE.Service.ProjectService;
+import com.DevConnect.BE.Utility.SimpleResponse;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +20,19 @@ import java.util.List;
 public class ProjectImplement implements ProjectService
 {
     @Autowired
-    ProjectRepo projectRepo;
+    private ProjectRepo projectRepo;
 
     @Autowired
     UserImplement userRepo;
 
-    ModelMapper mapper;
+    private ModelMapper mapper;
 
     ProjectImplement()
-    { mapper = MapperConfig(); }
+    {
+        mapper = MapperConfig();
+    }
 
-    private Project FindProject(Integer id)
+    private Project FindProject(Long id)
     { return projectRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", id.toString())); }
     private ProjectDTO SaveProject(Project project)
     {
@@ -44,7 +47,7 @@ public class ProjectImplement implements ProjectService
         return  projectDTO_l;
     }
 
-    private ModelMapper MapperConfig()//Would love to shift this into config but userRepo autowiring doesnt seem to work in Utility
+    public ModelMapper MapperConfig()//Would love to shift this into config but userRepo autowiring doesnt seem to work in Utility
     {
         ModelMapper mapper = new ModelMapper();
         Converter<List<User>, List<String>> UserToUsername = ctx -> ctx.getSource() == null ? null : getUsername(ctx.getSource());
@@ -83,18 +86,17 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO UpdateProject(ProjectDTO updatedProject, Integer id)
+    public ProjectDTO UpdateProject(ProjectDTO updatedProject, Long id)
     {
-        Project project = FindProject(id);
-        if(updatedProject.getId().equals(id))
-            project = mapper.map(updatedProject, Project.class);
-        else
+        if(!updatedProject.getId().equals(id))
             throw new RuntimeException("Project Id and updated project id must be same!");
+        Project project = FindProject(id);
+        project = mapper.map(updatedProject, Project.class);
         return SaveProject(project);
     }
 
     @Override
-    public ProjectDTO GetProject(Integer id)
+    public ProjectDTO GetProject(Long id)
     { return mapper.map(FindProject(id), ProjectDTO.class); }
 
     @Override
@@ -132,11 +134,21 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public void DeleteProject(Integer id)
-    { projectRepo.deleteById(id); }
+    public SimpleResponse DeleteProject(Long id)
+    {
+        FindProject(id);
+        projectRepo.deleteById(id);
+        SimpleResponse response = new SimpleResponse("Project with id: "+ id +" deleted!", true);
+        if(projectRepo.existsById(id))
+        {
+            response.setMessage("Failed to delete project with id: " + id);
+            response.setSuccess(false);
+        }
+        return response;
+    }
 
     @Override
-    public ProjectDTO AddCollaborator(Integer id, String username)
+    public ProjectDTO AddCollaborator(Long id, String username)
     {
         Project project = FindProject(id);
         List<User> collaborator = project.getCollaborator();
@@ -152,18 +164,18 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO UpdateCollaborator(Integer id, String oldColUsername, String newColUsername)
+    public ProjectDTO UpdateCollaborator(Long id, String oldColUsername, String newColUsername)
     {
         DeleteCollaborator(id, oldColUsername);
         return AddCollaborator(id, newColUsername);
     }
 
     @Override
-    public List<String> GetAllCollaborator(Integer id)
+    public List<String> GetAllCollaborator(Long id)
     { return projectRepo.findAllCollaborator(id); }
 
     @Override
-    public ProjectDTO DeleteCollaborator(Integer id, String username)
+    public ProjectDTO DeleteCollaborator(Long id, String username)
     {
         Project project = FindProject(id);
         List<User> collaborator= project.getCollaborator();
@@ -175,7 +187,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO DeleteAllCollaborator(Integer id)
+    public ProjectDTO DeleteAllCollaborator(Long id)
     {
         Project project = FindProject(id);
         project.setCollaborator(new ArrayList<>());
@@ -183,7 +195,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO UpdateDescription(Integer id, String newDescription)
+    public ProjectDTO UpdateDescription(Long id, String newDescription)
     {
         Project project = FindProject(id);
         project.setDescription(newDescription);
@@ -191,7 +203,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO AddRole(Integer id, String role)
+    public ProjectDTO AddRole(Long id, String role)
     {
         Project project = FindProject(id);
         List<String> allRoles = project.getRole();
@@ -201,7 +213,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO UpdateRole(Integer id, String oldRole, String newRole)
+    public ProjectDTO UpdateRole(Long id, String oldRole, String newRole)
     {
         Project project = FindProject(id);
         List<String> allRoles = project.getRole();
@@ -211,11 +223,11 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public List<String> GetAllRole(Integer id)
+    public List<String> GetAllRole(Long id)
     { return FindProject(id).getRole(); }
 
     @Override
-    public ProjectDTO DeleteRole(Integer id, String role)
+    public ProjectDTO DeleteRole(Long id, String role)
     {
         Project project = FindProject(id);
         List<String> allRoles = project.getRole();
@@ -225,7 +237,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO DeleteAllRole(Integer id)
+    public ProjectDTO DeleteAllRole(Long id)
     {
         Project project = FindProject(id);
         project.setRole(new ArrayList<>());
@@ -233,7 +245,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO AddCategory(Integer id, String category)
+    public ProjectDTO AddCategory(Long id, String category)
     {
         Project project = FindProject(id);
         List<String> categories = project.getCategory();
@@ -243,7 +255,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO UpdateCategory(Integer id, String oldCategory, String newCategory)
+    public ProjectDTO UpdateCategory(Long id, String oldCategory, String newCategory)
     {
         Project project = FindProject(id);
         List<String> categories = project.getCategory();
@@ -253,11 +265,11 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public List<String> GetAllCategory(Integer id)
+    public List<String> GetAllCategory(Long id)
     { return FindProject(id).getCategory(); }
 
     @Override
-    public ProjectDTO DeleteCategory(Integer id, String category)
+    public ProjectDTO DeleteCategory(Long id, String category)
     {
         Project project = FindProject(id);
         List<String> categories = project.getCategory();
@@ -267,7 +279,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO DeleteAllCategory(Integer id)
+    public ProjectDTO DeleteAllCategory(Long id)
     {
         Project project = FindProject(id);
         project.setCategory(new ArrayList<>());
@@ -275,7 +287,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO UpdateStatus(Integer id, String status)
+    public ProjectDTO UpdateStatus(Long id, String status)
     {
         Project project = FindProject(id);
         project.setStatus(status);
@@ -283,7 +295,7 @@ public class ProjectImplement implements ProjectService
     }
 
     @Override
-    public ProjectDTO UpdatePrivacyStatus(Integer id, String priv_status)
+    public ProjectDTO UpdatePrivacyStatus(Long id, String priv_status)
     {
         Project project = FindProject(id);
         project.setPrivacy_status(priv_status);

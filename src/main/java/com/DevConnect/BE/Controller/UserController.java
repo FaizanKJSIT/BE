@@ -104,10 +104,7 @@ public class UserController
 
     @DeleteMapping("{username}/")
     public ResponseEntity<SimpleResponse> deleteUser(@PathVariable String username)
-    {
-        userService.DeleteUser(username);
-        return new ResponseEntity<>(new SimpleResponse("User " + username + " deleted successfully", true), HttpStatus.OK);
-    }
+    { return new ResponseEntity<>(userService.DeleteUser(username), HttpStatus.OK); }
 
     @DeleteMapping("{username}/EmailId/{emailid}/")
     public ResponseEntity<UserDTO> deleteEmail(@PathVariable String username, @PathVariable String emailid)

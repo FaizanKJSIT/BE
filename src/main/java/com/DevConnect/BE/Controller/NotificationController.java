@@ -23,27 +23,27 @@ public class NotificationController
     { return new ResponseEntity<>(notificationService.AddNotification(ndto), HttpStatus.CREATED); }
 
     @PutMapping("{id}/")
-    public  ResponseEntity<NotificationDTO> updateNotification(@PathVariable Integer id, @RequestBody NotificationDTO ndto)
+    public  ResponseEntity<NotificationDTO> updateNotification(@PathVariable Long id, @RequestBody NotificationDTO ndto)
     { return new ResponseEntity<>(notificationService.UpdateNotification(id, ndto), HttpStatus.OK); }
 
     @PutMapping("{id}/Receiver/")
-    public ResponseEntity<NotificationDTO> updateReceiver(@PathVariable Integer id, @RequestParam(name = "NewReceiver") String newReceiver)
+    public ResponseEntity<NotificationDTO> updateReceiver(@PathVariable Long id, @RequestParam(name = "NewReceiver") String newReceiver)
     { return new ResponseEntity<>(notificationService.UpdateReceiver(id, newReceiver), HttpStatus.OK); }
 
     @PutMapping("{id}/Message/")
-    public ResponseEntity<NotificationDTO> updateMessage(@PathVariable Integer id, @RequestParam(name = "NewMessage") String newMessage)
+    public ResponseEntity<NotificationDTO> updateMessage(@PathVariable Long id, @RequestParam(name = "NewMessage") String newMessage)
     { return new ResponseEntity<>(notificationService.UpdateMessage(id, newMessage), HttpStatus.OK); }
 
     @PutMapping("{id}/Data/")
-    public ResponseEntity<NotificationDTO> updateData(@PathVariable Integer id, @RequestParam(name = "NewData") List<String> newData)
+    public ResponseEntity<NotificationDTO> updateData(@PathVariable Long id, @RequestParam(name = "NewData") List<String> newData)
     { return new ResponseEntity<>(notificationService.UpdateData(id, newData), HttpStatus.OK); }
 
     @GetMapping("{id}/")
-    public ResponseEntity<NotificationDTO> getNotification(@PathVariable Integer id)
+    public ResponseEntity<NotificationDTO> getNotification(@PathVariable Long id)
     { return new ResponseEntity<>(notificationService.GetNotification(id), HttpStatus.OK); }
 
     @GetMapping("{id}/Receiver/")
-    public ResponseEntity<UserDTO> getReceiver(@PathVariable Integer id)
+    public ResponseEntity<UserDTO> getReceiver(@PathVariable Long id)
     { return new ResponseEntity<>(notificationService.GetReceiver(id), HttpStatus.OK); }
 
     @GetMapping("All/")
@@ -51,9 +51,13 @@ public class NotificationController
     { return new ResponseEntity<>(notificationService.GetAllForReceiver(receiver), HttpStatus.OK); }
 
     @DeleteMapping("{id}/")
-    public ResponseEntity<SimpleResponse> deleteNotification(@PathVariable Integer id)
+    public ResponseEntity<SimpleResponse> deleteNotification(@PathVariable Long id)
+    { return new ResponseEntity<>(notificationService.DeleteNotification(id), HttpStatus.OK); }
+
+    @DeleteMapping("All/")
+    public ResponseEntity<SimpleResponse> deleteAllForReceiver(@RequestParam(name = "Receiver") String receiver)
     {
-        notificationService.DeleteNotification(id);
-        return new ResponseEntity<>(new SimpleResponse("Notification: "+ id +" deleted successfully", true), HttpStatus.OK);
+        notificationService.DeleteAllForUser(receiver);
+        return new ResponseEntity<>(new SimpleResponse("All notifications for " + receiver + " deleted!", true), HttpStatus.OK);
     }
 }

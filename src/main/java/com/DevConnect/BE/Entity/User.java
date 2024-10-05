@@ -37,4 +37,5 @@ public class User
     private List<String> interest;
 
     private String qualification;
+
 }

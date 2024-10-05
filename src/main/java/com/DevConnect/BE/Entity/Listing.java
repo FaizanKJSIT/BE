@@ -11,7 +11,7 @@ public class Listing
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Project listed_project;
