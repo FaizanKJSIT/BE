@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProjectRepo extends JpaRepository<Project, Integer>
+public interface ProjectRepo extends JpaRepository<Project, Long>
 {
     List<Project> findByCategoryIn(List <String> Category);
 
@@ -18,5 +18,5 @@ public interface ProjectRepo extends JpaRepository<Project, Integer>
     List<Project> findByRoleContaining(String Role);
 
     @Query("select u.username from Project p join User u where p.id = ?1")
-    List<String> findAllCollaborator(Integer id);
+    List<String> findAllCollaborator(Long id);
 }

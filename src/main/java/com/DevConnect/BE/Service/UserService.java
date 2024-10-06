@@ -2,6 +2,7 @@ package com.DevConnect.BE.Service;
 
 import com.DevConnect.BE.DataTransfer.UserDTO;
 import com.DevConnect.BE.Entity.User;
+import com.DevConnect.BE.Utility.SimpleResponse;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface UserService
     UserDTO UpdateUser(UserDTO updatedUser, String username);
     UserDTO GetUser(String username);
     List<UserDTO> GetAllUsers();
-    void DeleteUser(String username);
+    SimpleResponse DeleteUser(String username);
 
     UserDTO UpdateUsername(String username, String newUsername);
     void UpdateUserPassword(String username, String password, String newPassword);
@@ -36,4 +37,5 @@ public interface UserService
     List<UserDTO> GetUserByName(String firstname);
     List<UserDTO> GetUserByName(String firstname, String middlename, String lastname);
     boolean Authenticate(String username, String password);
+    boolean IsUnique(String username);
 }

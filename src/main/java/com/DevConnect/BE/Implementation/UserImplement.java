@@ -6,9 +6,9 @@ import com.DevConnect.BE.ExceptionH.*;
 import com.DevConnect.BE.Repo.UserRepo;
 import com.DevConnect.BE.Service.UserService;
 import com.DevConnect.BE.Utility.ModelMapperConfig;
+import com.DevConnect.BE.Utility.SimpleResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,19 +47,22 @@ public class UserImplement implements UserService
     @Override
     public UserDTO AddUser(User newUser)
     {
-        return SaveUser(newUser);
+        if(!userRepo.existsById(newUser.getUsername()))
+            return SaveUser(newUser);
+        else
+            throw new AlreadyExistsException("User", newUser.getUsername());
     }
 
     @Override
     public UserDTO UpdateUser(UserDTO updatedUser, String username)
     {
+        if(!updatedUser.getUsername().equals(username))
+            throw new RuntimeException("User username and passed username must be equal");
         User user = FindUser(username);
-        if(updatedUser.getUsername().equals(username))
-        {
-            String pass = user.getPassword();
-            user = mapper.map(updatedUser, User.class);
-            user.setPassword(pass);
-        }
+        String pass = user.getPassword();
+        user = mapper.map(updatedUser, User.class);
+        user.setPassword(pass);
+
         return SaveUser(user);
     }
 
@@ -217,12 +220,31 @@ public class UserImplement implements UserService
     { return UserDTOListMapper(userRepo.findByEmailId(email_id)); }
 
     @Override
-    public void DeleteUser(String username)
-    { userRepo.deleteById(username); }
+    public SimpleResponse DeleteUser(String username)
+    {
+        FindUser(username);
+        userRepo.deleteById(username);
+        SimpleResponse response = new SimpleResponse("User with username: " + username + " deleted!", true);
+        if(userRepo.existsById(username))
+        {
+            response.setMessage("Failed to delete user with username: " + username);
+            response.setSuccess(false);
+        }
+        return response;
+    }
 
+    @Override
     public boolean Authenticate(String username, String password)
     {
         User user = FindUser(username);
         return user.getPassword().equals(password);
+    }
+
+    @Override
+    public boolean IsUnique(String username)
+    {
+        if(username == null || userRepo.existsById(username))
+            return false;
+        return true;
     }
 }

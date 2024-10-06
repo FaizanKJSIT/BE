@@ -11,10 +11,12 @@ import java.util.List;
 
 public class ProjectDTO
 {
-    private Integer id;
+    private Long id;
     private List<String> collaborator;
     private String name;
     private String aim;
+    private String status;
+    private String privacy_status;
     private String scope;
     private String domain;
     private String description;

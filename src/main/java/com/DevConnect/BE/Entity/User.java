@@ -23,7 +23,6 @@ public class User
     @Size(min=8)
     private String password;
 
-    @Column(nullable = false)
     private String first_name;
     private String middle_name;
     private String last_name;
@@ -38,4 +37,5 @@ public class User
     private List<String> interest;
 
     private String qualification;
+
 }

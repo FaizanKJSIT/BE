@@ -12,7 +12,7 @@ public class Project
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
 
     @ManyToMany
     private List<User> collaborator;
@@ -22,6 +22,8 @@ public class Project
 
     private String aim; //Aim of the project
     private String scope; //What will the project cover
+    private String status;
+    private String privacy_status;
     private String domain; //Domain of the project
     private String description; //Description of the project
 
@@ -30,4 +32,7 @@ public class Project
 
     @ElementCollection
     private List<String> category; //All Categories
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "listed_project")
+    private Listing listing;
 }

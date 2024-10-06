@@ -4,21 +4,26 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+import java.util.List;
+
+
 @Setter
+@Getter
 @Entity
-public class Listing
+public class Notification
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Project listed_project;
+    @Column(nullable = false)
+    private String message;
 
     @ManyToOne
-    private User lister;
+    private User receiver;
 
-    @Column(nullable = false, length = 10)
-    private String date;
+    private String type;
+
+    @ElementCollection
+    List<String> data;
 }
