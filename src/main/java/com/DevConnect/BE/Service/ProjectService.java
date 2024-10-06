@@ -12,6 +12,7 @@ public interface ProjectService
     ProjectDTO AddProject(ProjectDTO project);
     ProjectDTO UpdateProject(ProjectDTO updatedProject, Long id);
     ProjectDTO GetProject(Long id);
+
     List<ProjectDTO> GetAllProject();
     List<ProjectDTO> GetProjectByCategoryI(List<String> Category); //Will return all project with at least 1 category matching(Inclusive)
     List<ProjectDTO> GetProjectByCategoryE(List<String> Category); //Will only return projects with all categories matching (Exclusive)
