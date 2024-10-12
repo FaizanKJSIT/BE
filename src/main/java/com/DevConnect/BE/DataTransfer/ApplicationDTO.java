@@ -12,7 +12,7 @@ public class ApplicationDTO
 
     private String applicant;
 
-    private ProjectDTO applied_project;
+    private Long applied_project;
 
     private String applied_role;
 

@@ -16,7 +16,7 @@ public class Application
     @ManyToOne
     private User applicant;
 
-    @OneToOne
+    @ManyToOne
     private Project applied_project;
 
     private String applied_role;

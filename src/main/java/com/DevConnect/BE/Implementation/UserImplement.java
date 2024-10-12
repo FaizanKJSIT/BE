@@ -10,8 +10,12 @@ import com.DevConnect.BE.Utility.SimpleResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class UserImplement implements UserService
@@ -36,6 +40,31 @@ public class UserImplement implements UserService
         return mapper.map(Updated_User, UserDTO.class);
     }
 
+    private static String generateHash(String input)
+    {
+        try
+        {
+            // Create a MessageDigest instance for SHA-256
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+            // Perform the hash computation
+            byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+            // Convert byte array into a hexadecimal string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedhash)
+            {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1)
+                    hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        }
+        catch (NoSuchAlgorithmException e)
+        { throw new RuntimeException(e); }
+    }
+
     public List<UserDTO> UserDTOListMapper(List<User> user_l)
     {
         List<UserDTO> userdto_l = new ArrayList<>(user_l.size());
@@ -48,7 +77,10 @@ public class UserImplement implements UserService
     public UserDTO AddUser(User newUser)
     {
         if(!userRepo.existsById(newUser.getUsername()))
+        {
+            newUser.setPassword(generateHash(newUser.getPassword()));
             return SaveUser(newUser);
+        }
         else
             throw new AlreadyExistsException("User", newUser.getUsername());
     }
@@ -85,7 +117,7 @@ public class UserImplement implements UserService
         if(!Authenticate(username, password))
             throw new AuthenticateFailureException(username);
         User user = FindUser(username);
-        user.setPassword(newPassword);
+        user.setPassword(generateHash(newPassword));
         SaveUser(user);
     }
 
@@ -237,7 +269,7 @@ public class UserImplement implements UserService
     public boolean Authenticate(String username, String password)
     {
         User user = FindUser(username);
-        return user.getPassword().equals(password);
+        return user.getPassword().equals(generateHash(password));
     }
 
     @Override

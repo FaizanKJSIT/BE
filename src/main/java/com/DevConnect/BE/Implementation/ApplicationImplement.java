@@ -4,6 +4,7 @@ import com.DevConnect.BE.DataTransfer.ApplicationDTO;
 import com.DevConnect.BE.DataTransfer.ProjectDTO;
 import com.DevConnect.BE.Entity.*;
 import com.DevConnect.BE.ExceptionH.AlreadyExistsException;
+import com.DevConnect.BE.ExceptionH.InvalidApplicationException;
 import com.DevConnect.BE.ExceptionH.ResourceNotFoundException;
 import com.DevConnect.BE.Repo.ApplicationRepo;
 import com.DevConnect.BE.Service.ApplicationService;
@@ -34,6 +35,13 @@ public class ApplicationImplement implements ApplicationService
     {
         mapper = projectRepo.MapperConfig();
 
+        Converter<Project, Long> ProjectToId = ctx -> ctx.getSource() == null ? null : ctx.getSource().getId();
+        mapper.typeMap(Application.class, ApplicationDTO.class).addMappings(mp->mp.using(ProjectToId).map(Application::getApplied_project, ApplicationDTO::setApplied_project));
+
+        //Horrible piece of code, uses id in applicationDto to get project using project repo, gets project dto instead then maps the dto to project then saves it to application
+        Converter<Long, Project> IdToProject = ctx -> ctx.getSource() == null ? null : mapper.map(projectRepo.GetProject(ctx.getSource()), Project.class);
+        mapper.typeMap(ApplicationDTO.class, Application.class).addMappings((mp->mp.using(IdToProject).map(ApplicationDTO::getApplied_project, Application::setApplied_project)));
+
         Converter<User, String> UserToUsername = ctx -> ctx.getSource() == null ? null : ctx.getSource().getUsername();
         mapper.typeMap(Application.class, ApplicationDTO.class).addMappings(mp->mp.using(UserToUsername).map(Application::getApplicant, ApplicationDTO::setApplicant));
 
@@ -60,6 +68,12 @@ public class ApplicationImplement implements ApplicationService
         return applDTO;
     }
 
+    private boolean CheckRole(Long projectId, String role)
+    {
+        Project project = mapper.map(projectRepo.GetProject(projectId), Project.class);
+        return project.getRole().contains(role);
+    }
+
     @Autowired
     public ApplicationImplement(ProjectImplement projectRepo)
     {
@@ -70,11 +84,20 @@ public class ApplicationImplement implements ApplicationService
     @Override
     public ApplicationDTO AddApplication(ApplicationDTO appl)
     {
+        //Checks if application already exists or not
         boolean applCheck = appl.getId() == null || !applicationRepo.existsById(appl.getId());
-        if(applCheck)
-            return SaveApplication(mapper.map(appl, Application.class));
-        else
+        //Checks if the role applied to actually exists or not
+        boolean roleCheck = appl.getApplied_role() == null || CheckRole(appl.getApplied_project(), appl.getApplied_role());
+        //Checks to make sure the applicant is not the same as the lister
+        boolean selfCheck = applicationRepo.GetAllSelfApplication(appl.getApplied_project(), appl.getApplicant()).isEmpty();
+
+        if(applCheck == false)
             throw new AlreadyExistsException("Application", appl.getId().toString());
+        else if(roleCheck == false)
+            throw new InvalidApplicationException(List.of(appl.getApplied_role()), "Applied Role Must Exist in the applied project!");
+        else if(selfCheck == false)
+            throw new InvalidApplicationException(List.of(appl.getApplicant(), appl.getApplied_project()), "Cannot apply to your own project!");
+        return SaveApplication(mapper.map(appl, Application.class));
     }
 
     @Override
@@ -100,6 +123,8 @@ public class ApplicationImplement implements ApplicationService
     public ApplicationDTO UpdateRole(Long id, String applied_role)
     {
         Application appl = FindApplication(id);
+        if(!CheckRole(appl.getApplied_project().getId(), applied_role))
+            throw new InvalidApplicationException(List.of(applied_role), "Applied Role Must Exist in the applied project!");
         appl.setApplied_role(applied_role);
         return SaveApplication(appl);
     }
