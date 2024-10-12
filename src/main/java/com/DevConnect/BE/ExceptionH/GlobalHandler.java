@@ -22,11 +22,15 @@ public class GlobalHandler
     public ResponseEntity<SimpleResponse> ResourceNotFoundHandler(ResourceNotFoundException e)
     { return new ResponseEntity<>(new SimpleResponse(e.message, false), HttpStatus.NOT_FOUND); }
 
-    @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<SimpleResponse> RuntimeExceptionHandler(RuntimeException r) //GENERIC EXCEPTIONHANDLER SHOULD CATCH ALL OTHER KINDS OF RUNTIME EXCEPTION
-    { return new ResponseEntity<>(new SimpleResponse(r.getMessage(), false), HttpStatus.BAD_REQUEST); }
-
     @ExceptionHandler(value = NoResourceFoundException.class)
     public ResponseEntity<SimpleResponse> NoResourceFoundExceptionHandler(NoResourceFoundException r)
+    { return new ResponseEntity<>(new SimpleResponse(r.getMessage(), false), HttpStatus.BAD_REQUEST); }
+
+    @ExceptionHandler(value = InvalidApplicationException.class)
+    public ResponseEntity<SimpleResponse> InvalidApplication(InvalidApplicationException a)
+    { return new ResponseEntity<>(new SimpleResponse(a.getMessage() + "\n" + a.getReason(), false), HttpStatus.BAD_REQUEST); }
+
+    @ExceptionHandler(value = RuntimeException.class)
+    public ResponseEntity<SimpleResponse> RuntimeExceptionHandler(RuntimeException r) //GENERIC EXCEPTIONHANDLER SHOULD CATCH ALL OTHER KINDS OF RUNTIME EXCEPTION
     { return new ResponseEntity<>(new SimpleResponse(r.getMessage(), false), HttpStatus.BAD_REQUEST); }
 }

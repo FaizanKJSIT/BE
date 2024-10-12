@@ -1,7 +1,10 @@
 package com.DevConnect.BE.ExceptionH;
 
+import lombok.Getter;
+
 import java.util.List;
 
+@Getter
 public class InvalidApplicationException extends RuntimeException
 {
     private String message = "Failed to validate attributes: ";
