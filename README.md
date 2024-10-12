@@ -5,6 +5,7 @@
 ### 2. These attributes are required to be passed to access services provided by those endpoints. 
 ### 3. When a body is requested the entire object with all atributes must be passed.
 ### 4. All Endpoints returns the same entity object back unless specified otherwise
+### 5. It is Recommended that you Drop and Recreate schema after each update if you are purely relying on hibernate to create database to avoid conflicts. 
 ---
 ## **I) User Entity**
 
@@ -26,52 +27,52 @@
   
 * **Add Email id:** \
   **URL:** "POST /Api/User/{username}/EmailId/"\
-  **Paramter:** ?NewEmailId = {email_id}\
+  **Parameter:** ?NewEmailId = {email_id}\
   **Info:** Adds email id to user with username: {username}
 
 * **Add Mobile No:** \
   **URL:** "POST /Api/User/{username}/MobileNo/"\
-  **Paramter:** ?NewMobileNo = {mobile_no}\
+  **Parameter:** ?NewMobileNo = {mobile_no}\
   **Info:** Adds mobile no to user with username: {username}
 
 * **Add Interest:** \
   **URL:** "POST /Api/User/{username}/Interest/"\
-  **Paramter:** ?NewInterest = {interest}\
+  **Parameter:** ?NewInterest = {interest}\
    **Info:** Adds new Interest Category to user with username: {username}
 
 * **Update User:** \
   **URL:** "PUT /Api/User/{username}/"\
-  **Paramter:** User Body with all attributes except password\
+  **Parameter:** User Body with all attributes except password\
   **Info:** Updates user with new user body. Make sure that username in url is the same as as username in user body. Use this when needing to update multiple attributes at once.
   
 * **Update Username:** \
   **URL:** "PUT /Api/User/{username}/Username/"\
-  **Paramter:** ?NewUsername = {username}\
+  **Parameter:** ?NewUsername = {username}\
   **Info:** Changes the username of user with usernamne: {username}.
 
 * **Update Password:** \
   **URL:** "PUT /Api/User/{username}/Password/"\
-  **Paramter:** ?OldPassword={password} & NewPassword={password}\
+  **Parameter:** ?OldPassword={password} & NewPassword={password}\
   **Info:** Updates password of user with username: {username}, uses the old password to authenticate this change.
 
 * **Update Name:** \
   **URL:** "PUT /Api/User/{username}/Name/"\
-  **Paramter:** ?FirstName={first_name} & MiddleName={middle_name} & LastName={last_name}\
+  **Parameter:** ?FirstName={first_name} & MiddleName={middle_name} & LastName={last_name}\
   **Info:** Updates name of user with username: {username}. You can leave any of the parameters blank which will result in only the remaining paramters to be updated.
   
 * **Replace EmailId:** \
   **URL:** "PUT /Api/User/{username}/EmailId/"\
-  **Paramter:** ?NewEmailId={email_id} & ?OldEmailId={email_id}\
+  **Parameter:** ?NewEmailId={email_id} & ?OldEmailId={email_id}\
   **Info:** Replaces OldEmailId of user with NewEmailId.
 
 * **Replace Mobile No:** \
   **URL:** "PUT /Api/User/{username}/MobileNo/"\
-  **Paramter:** ?NewMobileNo={mobile_no} & ?OldMobileNo={mobile_no}\
+  **Parameter:** ?NewMobileNo={mobile_no} & ?OldMobileNo={mobile_no}\
   **Info:** Replaces OldMobileNo of user with NewMobileNo.
 
 * **Update Qualification:** \
   **URL:** "PUT /Api/User/{username}/Qualification/"\
-  **Paramter:** ?NewQualification={qualification} \
+  **Parameter:** ?NewQualification={qualification} \
   **Info:** Updates Qualification of user with Username: {username} with {qualification}
 
 * **Get All Users:** \
@@ -96,12 +97,12 @@
 
 * **Authenticate User:** \
   **URL:** "GET /Api/User/Authenticate/{username}/"\
-  **Paramter:** ?Password={password}\
+  **Parameter:** ?Password={password}\
   **Info:** Returns a response object with message and success = true or false depending upon if the {password} matches users actual password.
 
 * **Check if username is unique or not:** \
   **URL:** "GET /Api/User/Unique/"\
-  **Paramter:** ?Username={username}\
+  **Parameter:** ?Username={username}\
   **Info:** Returns a response object with message and success = true or false depending upon if the {username} matches with any other username in the database.(true if it doesnt match)
 
 * **Delete User:** \
@@ -270,8 +271,8 @@
 ### **Attributes:**
 1. **Long id:** Constraints: Primary Key. (Note: Do not pass this attribute while creating a listing because it leads to unexpected behaviour because of spring autogeneration)
 2. **Project Entity listed_project:** Constraints: Not Null.
-3. **String lister:**
-4. **String date:**
+3. **String lister:** Constraints: none (Note: Must be the same as username of the user listing the project)
+4. **String date:** Constraints: none
 
 ### **Endpoints:** 
 
@@ -315,8 +316,69 @@
 
 ---
 ## **IV) Application Entity**
-### **TO BE COMPLETED LATER**
+### **Attributes:**
+1. **Long id:** Constraints: Primary Key. (Note: Do not pass this attribute while creating a listing because it leads to unexpected behaviour because of spring autogeneration)
+2. **String applicant:** Constraints: none (Note: This should be the same as username of the user applying)
+3. **Long applied_project:** Constraints: none (Note: This should be the same as primary key of project being applied to)
+4. **String applied_role:** Constraints: none (Note: The passed role must exist in the project being applied to)
+5. **String status:** Constraints: none
+6. **String date:** Constraints: not null
 
+### **Endpoints:** 
+
+* **Create Application:**\
+  **URL:** "POST /Api/Application/Add/"\
+  **Parameter:** Application with all attributes except id.\
+  **Info:** Will create an application with attributes as given in the body with automatically generated id.
+
+* **Update Application:**\
+  **URL:** "PUT /Api/Application/{id}/"\
+  **Parameter:** Application with all attributes including id. Make sure the object id and {id} match\
+  **Info:** Will update application with id = {id} with new attributes.
+
+* **Change Project being applied to:**\
+  **URL:** "PUT /Api/Application/{id}/Project/"\
+  **Parameter:** ?NewProjectId={project_id}\
+  **Info:** Will update project of application to the project with id = {id}.
+
+* **Change Role being applied to:**\
+  **URL:** "PUT /Api/Application/{id}/Role/"\
+  **Parameter:** ?NewRole={role}\
+  **Info:** Will update the role being applied to {role}.
+
+* **Update Status:**\
+  **URL:** "PUT /Api/Application/{id}/Status/"\
+  **Parameter:** ?NewStatus={project_id}\
+  **Info:** Will update application's status.
+
+* **Get a particular application:**\
+  **URL:** "GET /Api/Application/{id}/"\
+  **Info:** Will get application with id = {id}.
+
+* **Get all applications by a user:**\
+  **URL:** "GET /Api/Application/All/User/"\
+  **Parameter:** ?Applicant={username}\
+  **Info:** Will get all applications of a user.
+
+* **Get all applications to a project:**\
+  **URL:** "GET /Api/Application/All/Project/"\
+  **Parameter:** ?AProjectId={project_id}\
+  **Info:** Will get all applications to a project with id = {project_id}.
+  
+* **Get all applications for a specific Role on a project:**\
+  **URL:** "GET /Api/Application/All/Role/"\
+  **Parameter:** ?ProjectId={project_id} & Role={role}\
+  **Info:** Will get all applications applying for {role} on the project having id = {project_id}.
+
+* **Delete an application:**\
+  **URL:** "DELETE /Api/Application/{id}/"\
+  **Info:** Will delete application with id = {id}.
+
+* **Delete all applications for a project:**
+  **URL:** "DELETE /Api/Application/Project/"\
+  **Parameter:** ?ProjectId={project_id}
+  **Info:** Will delete all applications whose applied_project attribute matches {project_id}.
+  
 ---
 ## **V) Notification Entity**
 
